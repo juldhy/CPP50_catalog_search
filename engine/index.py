@@ -27,6 +27,9 @@ class SearchIndex:
 
         return dict(idx)
 
+    def get_index_tokens(self) -> list[str]:
+        return list(self.index.keys())
+
     def search(self, token: str) -> set[str]:
         return self.index.get(token.lower().strip(), set())
 
