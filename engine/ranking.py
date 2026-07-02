@@ -5,16 +5,9 @@ from functools import reduce
 from engine.tokenize import tokenize
 from engine.index import search_index
 
-# TODO: BEGIN replace with appropriate access to catalog and catalog index
-from collections import defaultdict
-import json
-def get_catalog()->dict:
-    with open('/home/ubuntu/PycharmProjects/CPP50_catalog_search/catalog.json') as json_file:
-        return {product['id']:product for product in json.load(json_file)}
-# TODO: END replace with appropriate access to catalog and catalog index
 
 
-def compute_score(product, query_tokens : list[str]) -> float:
+def compute_score(product, query_tokens : set[str]) -> float:
     """
     Scores the product with this formula:
        score = (matched_tokens / total_query_tokens) * 0.5
@@ -45,9 +38,9 @@ def search(query: str, top_k: int = 10) -> list[str]:
     :return: the top_k highest-scoring products as an ordered list
     """
 
-    catalog = get_catalog()
+    catalog = search_index.catalog
     query_tokens = set(tokenize(query))
-    candidates = reduce(lambda result, token : result.union(search_index.get(token, set())), query_tokens, set())
+    candidates = reduce(lambda result, token : result.union(search_index.index.get(token, set())), query_tokens, set())
     return list(map(lambda id_score:catalog.get(id_score[0]),
                     heapq.nlargest(top_k,
                           map(lambda candidate_id: (candidate_id, compute_score(catalog.get(candidate_id), query_tokens)), candidates),
