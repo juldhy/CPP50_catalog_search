@@ -11,6 +11,14 @@ class SearchIndex:
     def __init__(self, json_file: str):
         self.json_file = json_file
         self.index = self._build_index()
+        self.catalog = self._build_catalog()
+
+    def _build_catalog(self) -> dict[str, dict]:
+        with open(self.json_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        catalog = {item["id"]: item for item in data}
+        return catalog
 
     def _build_index(self) -> dict[str, set[str]]:
         with open(self.json_file, "r", encoding="utf-8") as f:
