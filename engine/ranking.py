@@ -6,7 +6,6 @@ from engine.tokenize import tokenize
 from engine.index import search_index
 
 
-
 def compute_score(product, query_tokens : set[str]) -> float:
     """
     Scores the product with this formula:
@@ -17,9 +16,12 @@ def compute_score(product, query_tokens : set[str]) -> float:
     :param query_tokens: all the query tokens
     :return: the product score
     """
-    return 0.5 * (len((set(tokenize(product['name'])) | set(product['tags'])) & query_tokens)  / len(query_tokens)) \
-        + 0.2 if product['stock'] > 0 else 0 \
-        + (1 / math.log2(product['sales_rank'] + 2)) * 0.3
+    if len(query_tokens) == 0:
+        return 0
+    else:
+        return 0.5 * (len( (set(tokenize(product['name'])) | set(map(str.lower,product['tags']))) & query_tokens)  / len(query_tokens)) \
+            + (0.2 if product['stock'] > 0 else 0) \
+            + (1 / math.log2(product['sales_rank'] + 2)) * 0.3
 
 
 def search(query: str, top_k: int = 10) -> list[str]:
