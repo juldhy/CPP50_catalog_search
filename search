@@ -1,0 +1,26 @@
+#!/usr/bin/env python3
+
+from argparse import Namespace, ArgumentParser
+
+
+class Parser:
+    """Parser that retreives the search term, category, and top number of results from the command line arguments."""
+
+    def __init__(self):
+        args = self._get_args()
+        self.search: str = args.search[0]
+        self.category: str | None = args.category
+        self.top: int = args.top
+
+    def _get_args(self) -> Namespace:
+        parser = ArgumentParser()
+        parser.add_argument("search", type=str, nargs="+")
+        parser.add_argument("-c", "--category", type=str)
+        parser.add_argument("-t", "--top", type=int, default=10)
+        args, unknown = parser.parse_known_args()
+        return args
+
+
+if __name__ == "__main__":
+    parser = Parser()
+    print(f"search results for: {parser.search}")
