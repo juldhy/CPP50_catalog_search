@@ -29,3 +29,6 @@ class SearchIndex:
 
     def search(self, token: str) -> set[str]:
         return self.index.get(token.lower().strip(), set())
+
+
+search_index = SearchIndex("./catalog.json")
