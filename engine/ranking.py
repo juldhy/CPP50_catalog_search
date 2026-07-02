@@ -54,9 +54,4 @@ def search(query: str, top_k: int = 10) -> list[str]:
                           key=lambda x: x[1])))
 
 
-if __name__ == '__main__':
-    print(search("wireless keyboard", top_k=5))
-
-
-
 
