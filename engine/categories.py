@@ -44,20 +44,20 @@ class CategoryTree:
         return category_tree
 
 
-    def search_in_category(self, query: str, top_k: int = 10) -> list:
-        query = list(word.capitalize() for word in query.split("/"))
+    def search_in_category(self, query: str, category: str, top_k: int = 10) -> list:
+        category = list(word.capitalize() for word in category.split("/"))
         current_level = self.tree
         search_request = {}
         current_search_level = search_request
         full_valid_path = ""
 
-        # Find the deepest correct category match based on query input.
-        for i, entry in enumerate(query, start=1):
+        # Find the deepest correct category match based on category input.
+        for i, entry in enumerate(category, start=1):
             if entry not in current_level:
                 print(f"Your search yielded no results in the {entry} category.")
                 break
             else:
-                is_last = (i == len(query))
+                is_last = (i == len(category))
                 current_search_level[entry] = None if is_last else {}
             current_level = current_level[entry]
             current_search_level = current_search_level[entry]
