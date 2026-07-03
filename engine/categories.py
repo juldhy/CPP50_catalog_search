@@ -1,5 +1,6 @@
 import json
 from engine.ranking import compute_score
+from engine.ranking import search
 
 
 class CategoryTree:
@@ -54,31 +55,38 @@ class CategoryTree:
         # Find the deepest correct category match based on category input.
         for i, entry in enumerate(category, start=1):
             if entry not in current_level:
-                print(f"Your search yielded no results in the {entry} category.")
+                if full_valid_path != "":
+                    print(f"The {entry} category doesn't exist. Displaying items in the {full_valid_path} category.")
+                else:
+                    print(f"The {entry} category doesn't exist. Displaying 10 items based only on {query}.")
                 break
-            else:
-                is_last = (i == len(category))
-                current_search_level[entry] = None if is_last else {}
+            is_last = (i == len(category))
+            current_search_level[entry] = None if is_last else {}
             current_level = current_level[entry]
             current_search_level = current_search_level[entry]
             full_valid_path = f"{full_valid_path}/{entry}" if full_valid_path else entry
 
-        # Run the search based on the final, deepest level reached in the category tree.
-        valid_results = []
-        for item in self.catalog:
-            if full_valid_path in item.get("category"):
-                valid_results.append(item)
+        # Safeguarding against no valid path potentially returning the whole catalog.
+        if full_valid_path == "":
+            final_results = search(query, 10)
 
-        # Weigh valid products based on the scoring algorithm.
-        weighted_results = []
-        for item in valid_results:
-            score = compute_score(item, set(query))
-            weighted_results.append((score, item["name"]))
+        else:
+            # Run the search based on the final, deepest level reached in the category tree.
+            valid_results = []
+            for item in self.catalog:
+                if full_valid_path in item.get("category"):
+                    valid_results.append(item)
 
-        # Sort by relevance and limit the amount of results displayed.
-        weighted_results.sort(reverse=True)
-        final_results = []
-        for i in range(min(len(weighted_results), top_k)):
-            final_results.append(weighted_results[i][1])
+            # Weigh valid products based on the scoring algorithm.
+            weighted_results = []
+            for item in valid_results:
+                score = compute_score(item, set(query))
+                weighted_results.append((score, item["name"]))
+
+            # Sort by relevance and limit the amount of results displayed.
+            weighted_results.sort(reverse=True)
+            final_results = []
+            for i in range(min(len(weighted_results), top_k)):
+                final_results.append(weighted_results[i][1])
 
         return final_results

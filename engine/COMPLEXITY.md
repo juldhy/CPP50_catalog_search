@@ -12,10 +12,20 @@ Part 3: categories.py
         If there are n=5000 entries and 50 unique paths of average depth k=3,
         the total would be 5150 which is basically equal to n.
         BFS/DFS would not have been faster here, as each entry in the catalog needs to be looked up either way.
-TODO
     Step 2: Running a search by category
-    - Query-time complexity:
+    - Query-time complexity: O(n) where n is the length of the catalog. The other parts of the method can bring this
+        up to 2n + k where k = (length of the category path + amount of results returned), and 2n because the whole
+        catalog may be in the initial valid results, but ultimately it all simplifies to O(n).
+        It is most likely possible to run this in a much faster way by previously indexing all possible category paths
+        and assigning them an id, assuming we are allowed to add a "CategoryID" field to the products.
     - Example:
+        Running the following command: python3 search "Wireless Adaptor" --category "Electronics/Phone" will first
+        decouple the path branch by branch and break off at the first invalid one. Whatever was valid before that point
+        serves as the category used for filtering results. If no valid category exists, the method branches back to the
+        standard search function and forces 10 results to be displayed based on the query terms.
+            If the path is valid, the method then searches through the whole catalog for path membership in the
+            "Category" field, then scores those results based on relevance with the query terms.
+            Finally, the results are sorted by score and the requested (or default) amount of results is displayed.
 
 
 Part 4: suggest.py
