@@ -1,0 +1,52 @@
+
+
+
+
+
+Part 3: categories.py
+    Step 1: Building the catalog
+    - Data structure choice: nested dictionaries, as all access operations are O(1).
+        A set of sets would have had the same complexity, but is less common for "tree"-type structures.
+    - Build-time complexity: O(n*k) where k is the average path depth is the absolute worst case scenario.
+        More reasonably, O(n) will be the expected time complexity, particularly as the catalog gets bigger.
+        If there are n=5000 entries and 50 unique paths of average depth k=3,
+        the total would be 5150 which is basically equal to n.
+        BFS/DFS would not have been faster here, as each entry in the catalog needs to be looked up either way.
+TODO
+    Step 2: Running a search by category
+    - Query-time complexity:
+    - Example:
+
+
+Part 4: suggest.py
+    Step 1: Building the index of valid words
+    - Data structure choice: a list of strings, created by re-using the tokenize method for indexing the catalog.
+        The list (lexicon) is created from the existing set of all unique strings contained in all product names.
+        Keeping the set format would have worked here as well, but lists are usually easier to work with
+        and have more features that can be useful if it turns out they're needed (sorting, for example).
+    - Build-time complexity: technically speaking, zero. The data is already created for Part 1, and we're simply
+        re-using it here. The complexity of that method is O(n*(k+l)) where k and l are the average amounts of
+        words in the product names and tags per product, respectively.
+    Step 2: Suggesting corrections based on a failed search query
+    - Query-time complexity: O(V + Q²*C) where V is the size of the lexicon, Q is the length of the initial query,
+        and C is the amount of words in the lexicon whose length is Close to that of Q (Q-3 < C < Q+3).
+            While this might look expensive at first, note that, for a Q that gets ridiculously large,
+            C will converge towards zero (at least, for most known languages).
+                Q² is explained by the fact that two words are being compared,
+                and the one that is compared to the initial query is of average length Q as well.
+        This beats the "expected" O(V*L²) where L is the average word length in the entire lexicon because the
+        method filters out lexicon words that are too much longer or too much shorter than the initial query.
+        In return for that check, the resource-intensive edit distance calculator method is called less often.
+            Math comparison:
+            Q²*C ~= L²*V in the worst case scenario where the query's length is close to every word of the lexicon.
+            This matches the second formula, but that one is static regardless of Q.
+            V is also the much bigger number for any reasonable catalog, therefore, its absence from the multiplication
+            is almost always going to be an advantage.
+            On the other hand, when Q is small, the squaring is negligible, and when Q grows very large, C is expected
+            to shrink. In the middle, Q²*C can be read as L²*L, which is almost always smaller than L²*V.
+    - Example:
+        With the following parameters: V = 200; Q = 8; C = 100; L = 10
+            V + Q²*C = 200 + 6400 = 6600 (or V + Q*L*C = 8200)
+            V*L² = 20000
+        Thus, even when half (C) the lexicon (V) matches the tolerated edit difference size, filtering ahead yields
+        much better results.
