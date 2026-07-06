@@ -83,7 +83,7 @@ def make_product(i: int) -> dict:
 
 
 catalog = [make_product(i) for i in range(5000)]
-with open("catalog.json", "w") as f:
+with open("engine/catalog.json", "w") as f:
     json.dump(catalog, f, indent=2)
 
 print(f"Generated {len(catalog)} products -> catalog.json")

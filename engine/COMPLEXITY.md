@@ -39,7 +39,7 @@ Part 4: suggest.py
         words in the product names and tags per product, respectively.
     Step 2: Suggesting corrections based on a failed search query
     - Query-time complexity: O(V + Q²*C) where V is the size of the lexicon, Q is the length of the initial query,
-        and C is the amount of words in the lexicon whose length is Close to that of Q (Q-3 < C < Q+3).
+        and C is the amount of words in the lexicon whose length is Close to that of Q (C = Q±2).
             While this might look expensive at first, note that, for a Q that gets ridiculously large,
             C will converge towards zero (at least, for most known languages).
                 Q² is explained by the fact that two words are being compared,
@@ -55,8 +55,11 @@ Part 4: suggest.py
             On the other hand, when Q is small, the squaring is negligible, and when Q grows very large, C is expected
             to shrink. In the middle, Q²*C can be read as L²*L, which is almost always smaller than L²*V.
     - Example:
-        With the following parameters: V = 200; Q = 8; C = 100; L = 10
-            V + Q²*C = 200 + 6400 = 6600 (or V + Q*L*C = 8200)
+        With the following parameters: V = 200; Q = 12; C = 100; L = 10 (Q > L is a bad scenario, and C is large here)
+            V + Q²*C = 200 + 14400 = 14600 (or V + Q*L*C = 12200)
             V*L² = 20000
+        With Q = 8 (a better scenario), this becomes:
+            V + Q²*C = 200 + 6400 = 6600 (or V + Q*L*C = 8200)
         Thus, even when half (C) the lexicon (V) matches the tolerated edit difference size, filtering ahead yields
-        much better results.
+        better results, nearly averaging a 50% cut in processing time even when half of the lexicon's entries
+        approach the length of the query.
