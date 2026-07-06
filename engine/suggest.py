@@ -1,9 +1,24 @@
 from engine.index import search_index
 
 
-lexicon = search_index.get_index_tokens()
+def suggest(query: str, max_suggestions: int = 3, lexicon: list[str] = search_index.get_index_tokens()) -> list[str]:
+    """
+    Suggests a plausible search token based on the user's initial output if no match was found,
+    based on edit distance.
 
-def suggest(query: str, max_suggestions: int = 3) -> list[str]:
+    This method scans the global catalog lexicon for words that are close to what the user typed,
+    and returns a short list of suggestions if any are found. Only one query word is treated per call,
+    meaning the parsing and splitting needs to be performed ahead of the calls.
+
+    Args:
+        query (str): The search terms entered by the user.
+        max_suggestions (int, optional): Maximum number of results to return.
+            Default is 3.
+        lexicon (list[str], optional): The list of lexicon tokens to use.
+
+    Returns:
+        list[str]: A list of words closely resembling the searched term.
+    """
     possible_matches = []
     query = query.lower()
     for word in lexicon:
