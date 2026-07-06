@@ -105,39 +105,42 @@ class TestCategories(unittest.TestCase):
         pass
 
 
-@patch('engine.index.search_index.index', {'webcom': [], 'webcam': [], 'keyboard': []})
 class TestSuggest(unittest.TestCase):
     def setUp(self):
         self.longMessage = True
+        self.test_lexicon = list({'webcom': [], 'webcam': [], 'keyboard': []}.keys())
 
     def tearDown(self):
         pass
 
     def test_suggest_single_word(self):
         global search_index
-        print(f"NB: Testing suggest() with index tokens = {search_index.get_index_tokens()}")
-        self.assertEqual(3, len(search_index.get_index_tokens()), msg="Incorrect test premises")
-        self.assertIn('keyboard', search_index.get_index_tokens(), msg="Incorrect test premises")
-        self.assertEqual(["keyboard"], suggest("keybaord"))
-        self.assertEqual([], suggest("kebaord"))
-        self.assertEqual([], suggest("kebaorg"))
-        self.assertEqual(['keyboard'], suggest("keyboard"))
-        self.assertEqual([], suggest("computer"))
+        print(f"NB: Testing suggest() with index tokens = {self.test_lexicon}")
+        self.assertEqual(3, len(self.test_lexicon ), msg="Incorrect test premises")
+        self.assertIn('keyboard', self.test_lexicon, msg="Incorrect test premises")
+        self.assertEqual(["keyboard"], suggest("keybaord", lexicon=self.test_lexicon) )
+        self.assertEqual([], suggest("kebaord", lexicon=self.test_lexicon))
+        self.assertEqual([], suggest("kebaorg", lexicon=self.test_lexicon))
+        self.assertEqual(['keyboard'], suggest("keyboard",  lexicon=self.test_lexicon))
+        self.assertEqual([], suggest("computer",  lexicon=self.test_lexicon))
 
-        self.assertIn('webcam', search_index.get_index_tokens(), msg="Incorrect test premises")
-        self.assertIn('webcom', search_index.get_index_tokens(), msg="Incorrect test premises")
+        self.assertIn('webcam', self.test_lexicon, msg="Incorrect test premises")
+        self.assertIn('webcom', self.test_lexicon, msg="Incorrect test premises")
+        self.assertEqual(['webcam'], suggest("Webcm", 1, lexicon=self.test_lexicon), msg="here")
+        self.assertEqual(['webcam', 'webcom'], suggest("wabcam",  lexicon=self.test_lexicon))
+        self.assertEqual(['webcam'], suggest("webcame", 1,  lexicon=self.test_lexicon))
 
-        self.assertEqual(['webcam'], suggest("Webcm", 1), msg="here")
-        self.assertEqual(['webcam', 'webcom'], suggest("wabcam"))
-        self.assertEqual(['webcam'], suggest("webcame", 1))
+        # test default lexicon (uses ../catalog.json)
+        print(f"NB: Testing suggest() with default index tokens = {search_index.get_index_tokens()}")
+        self.assertEqual(['hub', 'usb'], suggest("ub", 2))
 
     def test_suggest_multiple_words(self):
-        self.assertEqual(["keyboard"], suggest("keyborad"))
+        self.assertEqual(["keyboard"], suggest("keyborad",  lexicon=self.test_lexicon))
 
     def test_suggest_limit_cases(self):
-        self.assertEqual([], suggest(""))
-        self.assertEqual([], suggest("keyborad", 0))
-        self.assertEqual(['keyboard'], suggest("keyboard", 10))
+        self.assertEqual([], suggest("",  lexicon=self.test_lexicon))
+        self.assertEqual([], suggest("keyborad", 0,  lexicon=self.test_lexicon))
+        self.assertEqual(['keyboard'], suggest("keyboard", 10,  lexicon=self.test_lexicon))
 
 
 if __name__ == '__main__':
