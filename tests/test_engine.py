@@ -45,8 +45,17 @@ class TestRanking(unittest.TestCase):
         products = search("wireless keyboard", top_k=-1)
         self.assertEqual(len(products), 0)
 
-        products = search(" ".join(search_index.index.keys()), top_k=len(search_index.catalog))
+        query_tokens = search_index.index.keys()
+        products = search(" ".join(query_tokens), top_k=len(search_index.catalog))
         self.assertEqual(len(products), len(search_index.catalog))
+        self.assertEqual(products, sorted(products, key=lambda x:compute_score(x,set(query_tokens)), reverse=True))
+
+        query_tokens = set(list(search_index.index.keys())[0:3])
+        products = search(" ".join(query_tokens), top_k=5000)
+        self.assertLessEqual(3, len(products))
+        self.assertGreaterEqual(5000, len(products))
+        self.assertEqual(products, sorted(products, key=lambda x:compute_score(x,query_tokens), reverse=True))
+
 
     def test_score(self):
         self.assertEqual(0, compute_score({'name': '', 'tags':[], 'stock':0, 'sales_rank':0}, set()), 0)
