@@ -12,10 +12,20 @@ Part 3: categories.py
         If there are n=5000 entries and 50 unique paths of average depth k=3,
         the total would be 5150 which is basically equal to n.
         BFS/DFS would not have been faster here, as each entry in the catalog needs to be looked up either way.
-TODO
     Step 2: Running a search by category
-    - Query-time complexity:
+    - Query-time complexity: O(n) where n is the length of the catalog. The other parts of the method can bring this
+        up to 2n + k where k = (length of the category path + amount of results returned), and 2n because the whole
+        catalog may be in the initial valid results, but ultimately it all simplifies to O(n).
+        It is most likely possible to run this in a much faster way by previously indexing all possible category paths
+        and assigning them an id, assuming we are allowed to add a "CategoryID" field to the products.
     - Example:
+        Running the following command: python3 search "Wireless Adaptor" --category "Electronics/Phone" will first
+        decouple the path branch by branch and break off at the first invalid one. Whatever was valid before that point
+        serves as the category used for filtering results. If no valid category exists, the method branches back to the
+        standard search function and forces 10 results to be displayed based on the query terms.
+            If the path is valid, the method then searches through the whole catalog for path membership in the
+            "Category" field, then scores those results based on relevance with the query terms.
+            Finally, the results are sorted by score and the requested (or default) amount of results is displayed.
 
 
 Part 4: suggest.py
@@ -29,7 +39,7 @@ Part 4: suggest.py
         words in the product names and tags per product, respectively.
     Step 2: Suggesting corrections based on a failed search query
     - Query-time complexity: O(V + Q²*C) where V is the size of the lexicon, Q is the length of the initial query,
-        and C is the amount of words in the lexicon whose length is Close to that of Q (Q-3 < C < Q+3).
+        and C is the amount of words in the lexicon whose length is Close to that of Q (C = Q±2).
             While this might look expensive at first, note that, for a Q that gets ridiculously large,
             C will converge towards zero (at least, for most known languages).
                 Q² is explained by the fact that two words are being compared,
@@ -45,8 +55,11 @@ Part 4: suggest.py
             On the other hand, when Q is small, the squaring is negligible, and when Q grows very large, C is expected
             to shrink. In the middle, Q²*C can be read as L²*L, which is almost always smaller than L²*V.
     - Example:
-        With the following parameters: V = 200; Q = 8; C = 100; L = 10
-            V + Q²*C = 200 + 6400 = 6600 (or V + Q*L*C = 8200)
+        With the following parameters: V = 200; Q = 12; C = 100; L = 10 (Q > L is a bad scenario, and C is large here)
+            V + Q²*C = 200 + 14400 = 14600 (or V + Q*L*C = 12200)
             V*L² = 20000
+        With Q = 8 (a better scenario), this becomes:
+            V + Q²*C = 200 + 6400 = 6600 (or V + Q*L*C = 8200)
         Thus, even when half (C) the lexicon (V) matches the tolerated edit difference size, filtering ahead yields
-        much better results.
+        better results, nearly averaging a 50% cut in processing time even when half of the lexicon's entries
+        approach the length of the query.
