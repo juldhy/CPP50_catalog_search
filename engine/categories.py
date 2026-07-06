@@ -9,11 +9,9 @@ class CategoryTree:
         self.catalog = self._build_catalog()
         self.tree = self._build_category_tree()
 
-
     def _build_catalog(self) -> list:
         with open(self.json_file, "r", encoding="utf-8") as f:
             return json.load(f)
-
 
     def _build_category_tree(self) -> dict:
         # Creates and returns a series of nested dictionaries representing a tree with all the categories.
@@ -29,7 +27,9 @@ class CategoryTree:
             accumulated_path = ""
             for i, step in enumerate(path, start=1):
                 # Proper formatting to avoid putting a / on the final category of a branch.
-                accumulated_path = f"{accumulated_path}/{step}" if accumulated_path else step
+                accumulated_path = (
+                    f"{accumulated_path}/{step}" if accumulated_path else step
+                )
                 # Skip ahead if this part of the path already exists.
                 if accumulated_path in index_categories:
                     current_level = index_categories[accumulated_path]
@@ -37,12 +37,11 @@ class CategoryTree:
                 # Creation of the new entry happens here: None if we're at the end of a branch,
                 # empty dict otherwise because we know it will be filled on the next step anyway.
                 if step not in current_level:
-                    is_last = (i == len(path))
+                    is_last = i == len(path)
                     current_level[step] = None if is_last else {}
                 index_categories[accumulated_path] = current_level[step]
                 current_level = current_level[step]
         return category_tree
-
 
     def search_in_category(self, query: str, category: str, top_k: int = 10) -> list:
         category = list(word.capitalize() for word in category.split("/"))
@@ -57,7 +56,7 @@ class CategoryTree:
                 print(f"Your search yielded no results in the {entry} category.")
                 break
             else:
-                is_last = (i == len(category))
+                is_last = i == len(category)
                 current_search_level[entry] = None if is_last else {}
             current_level = current_level[entry]
             current_search_level = current_search_level[entry]
@@ -73,10 +72,10 @@ class CategoryTree:
         weighted_results = []
         for item in valid_results:
             score = compute_score(item, set(query))
-            weighted_results.append((score, item["name"]))
+            weighted_results.append((score, item))
 
         # Sort by relevance and limit the amount of results displayed.
-        weighted_results.sort(reverse=True)
+        weighted_results.sort(reverse=True, key=lambda x: x[1]["name"])
         final_results = []
         for i in range(min(len(weighted_results), top_k)):
             final_results.append(weighted_results[i][1])

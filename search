@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from argparse import Namespace, ArgumentParser
+from engine.categories import CategoryTree
 from engine.suggest import suggest
 from engine.ranking import search
 
@@ -23,15 +24,27 @@ class Parser:
         return args
 
 
-if __name__ == "__main__":
+def main():
+    # Get arguments from command line
     parser = Parser()
-    print(f"Results for: {parser.search}")
-    search_results = search(parser.search, top_k=parser.top)
 
+    # Get results based on category or not
+    search_results: list = []
+    if parser.category:
+        c = CategoryTree("./catalog.json")
+        search_results = c.search_in_category(
+            parser.search, parser.category, top_k=parser.top
+        )
+    else:
+        search_results = search(parser.search, top_k=parser.top)
+
+    # Show results
+    print(f"Results for: {parser.search}")
+    # Show suggestions on no results
     if not search_results:
         print("No results found.")
+
         print("Did you mean:")
-        suggestions = suggest(parser.search, max_suggestions=3)
         for word in parser.search.split(" "):
             suggestions = suggest(word, max_suggestions=3)
             print(f"{word} -> {", ".join(suggestions)}")
@@ -43,3 +56,7 @@ if __name__ == "__main__":
                 f"€{search_result["price"]} | {search_result["stock"]} in stock | rank #{search_result["sales_rank"]}"
             )
             print("")
+
+
+if __name__ == "__main__":
+    main()
