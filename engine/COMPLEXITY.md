@@ -1,7 +1,13 @@
 
 
 
-
+Part 2: ranking.py
+    The sort() and sorted() algorhythms have complexity O(n log n).
+    The min heap algorythm to retrieve top_k sorted elements has complexity O(n log top_k). However, there is an extra 
+    cost for building the min heap binary tree, of which the complexity is O(n).
+    The total complexity of using min heap is then O(n + n log top_k), which, for top_k << n, is less than O(n log n).
+    When top_k==n, the min heap perf is lower than the sort()/sorted() perf.
+    
 
 Part 3: categories.py
     Step 1: Building the catalog
