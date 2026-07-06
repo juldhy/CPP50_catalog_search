@@ -1,12 +1,11 @@
 import math
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from engine.tokenize import tokenize
 from engine.index import search_index, SearchIndex
 from engine.ranking import search, compute_score
-#from engine.categories import search_in_category
-#from engine.suggest import suggest
+from engine.suggest import suggest
 
 
 class TestTokenize(unittest.TestCase):
@@ -22,7 +21,6 @@ class TestTokenize(unittest.TestCase):
 
 class TestRanking(unittest.TestCase):
     def setUp(self):
-        """Read the catalog and build its index"""
         pass
 
     def tearDown(self):
@@ -89,7 +87,6 @@ class TestIndex(unittest.TestCase):
 
 class TestCategories(unittest.TestCase):
     def setUp(self):
-        """Read the catalog and build its index?"""
         pass
 
     def tearDown(self):
@@ -98,38 +95,40 @@ class TestCategories(unittest.TestCase):
     def test_categories(self):
         pass
 
+
+@patch('engine.index.search_index.index', {'webcom': [], 'webcam': [], 'keyboard': []})
 class TestSuggest(unittest.TestCase):
-    """Read the test catalog and build its index"""
     def setUp(self):
-        global search_index
-        search_index = SearchIndex("tests/test_catalog_suggest.json")
-        search_index.get_index_tokens = MagicMock(return_value=['keyboard', 'webcam', 'webcom', 'rechargeable', 'usb'], wraps=search_index.get_index_tokens)
+        self.longMessage = True
 
     def tearDown(self):
         pass
 
     def test_suggest_single_word(self):
-        self.assertEqual(5, len(search_index.get_index_tokens()), msg="Incorrect test premises")
+        global search_index
+        print(f"NB: Testing suggest() with index tokens = {search_index.get_index_tokens()}")
+        self.assertEqual(3, len(search_index.get_index_tokens()), msg="Incorrect test premises")
         self.assertIn('keyboard', search_index.get_index_tokens(), msg="Incorrect test premises")
-        #self.assertEqual(["keyboard"], suggest("keybaord"))
-        #self.assertEqual(["keyboard"], suggest("kyebaord"))
-        #self.assertEqual([], suggest("kebaorg"))
-        #self.assertEqual([], suggest("keyboard"))
+        self.assertEqual(["keyboard"], suggest("keybaord"))
+        self.assertEqual([], suggest("kebaord"))
+        self.assertEqual([], suggest("kebaorg"))
+        self.assertEqual(['keyboard'], suggest("keyboard"))
+        self.assertEqual([], suggest("computer"))
 
         self.assertIn('webcam', search_index.get_index_tokens(), msg="Incorrect test premises")
         self.assertIn('webcom', search_index.get_index_tokens(), msg="Incorrect test premises")
-        #self.assertEqual(['webcam','webcom'], suggest("webcm"))
-        #self.assertEqual([], suggest("Webcm", 1))
-        # self.assertEqual(['webcam', 'webcom'], suggest("webcame"))
-        # self.assertEqual(['webcam'], suggest("webcame", 1))
+
+        self.assertEqual(['webcam'], suggest("Webcm", 1), msg="here")
+        self.assertEqual(['webcam', 'webcom'], suggest("wabcam"))
+        self.assertEqual(['webcam'], suggest("webcame", 1))
 
     def test_suggest_multiple_words(self):
-        self.assertEqual(["keyboard"], suggest("keybaord"))
+        self.assertEqual(["keyboard"], suggest("keyborad"))
 
     def test_suggest_limit_cases(self):
-        pass
-        #self.assertEqual([], suggest(""))
-        #self.assertEqual([], suggest("", 0))
+        self.assertEqual([], suggest(""))
+        self.assertEqual([], suggest("keyborad", 0))
+        self.assertEqual(['keyboard'], suggest("keyboard", 10))
 
 
 if __name__ == '__main__':
