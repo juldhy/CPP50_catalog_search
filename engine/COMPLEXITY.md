@@ -1,7 +1,18 @@
+Part 1: index.py
+    _build_index has a O(n) time complexity
+    It loops a list of item to build a dict
+
+    search has a O(1) time complexity
+    It looks in the dict for a specific token
 
 
-
-
+Part 2: ranking.py
+    The sort() and sorted() algorhythms have complexity O(n log n).
+    The min heap algorythm to retrieve top_k sorted elements has complexity O(n log top_k). However, there is an extra 
+    cost for building the min heap binary tree, of which the complexity is O(n).
+    The total complexity of using min heap is then O(n + n log top_k), which, for top_k << n, is less than O(n log n).
+    When top_k==n, the min heap perf is lower than the sort()/sorted() perf.
+    
 
 Part 3: categories.py
     Step 1: Building the catalog
@@ -63,3 +74,8 @@ Part 4: suggest.py
         Thus, even when half (C) the lexicon (V) matches the tolerated edit difference size, filtering ahead yields
         better results, nearly averaging a 50% cut in processing time even when half of the lexicon's entries
         approach the length of the query.
+
+
+Part 5: search
+    A method that uses previous parts in it.
+    Consider it as the entry point of the project
