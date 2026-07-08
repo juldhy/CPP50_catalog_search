@@ -1,0 +1,134 @@
+[
+  {
+    "id": "P00000",
+    "name": "Hdmi Ergonomic Monitor Keyboard",
+    "category": "Electronics/Computers/Peripherals",
+    "tags": [
+      "rechargeable",
+      "usb",
+      "smart"
+    ],
+    "price": 591.95,
+    "stock": 16,
+    "sales_rank": 245
+  },
+  {
+    "id": "P00001",
+    "name": "Backlit Foldable",
+    "category": "Electronics/Phones/Accessories",
+    "tags": [
+      "max",
+      "ergonomic",
+      "pro",
+      "silent",
+      "smart",
+      "switch"
+    ],
+    "price": 451.51,
+    "stock": 142,
+    "sales_rank": 54
+  },
+  {
+    "id": "P00002",
+    "name": "Hub Desk",
+    "category": "Electronics/Computers/Peripherals",
+    "tags": [
+      "adjustable",
+      "backlit",
+      "desk",
+      "usb"
+    ],
+    "price": 382.65,
+    "stock": 183,
+    "sales_rank": 2818
+  },
+  {
+    "id": "P00003",
+    "name": "Mouse Compact Printer Smart",
+    "category": "Office/Supplies/Paper",
+    "tags": [
+      "adapter",
+      "bluetooth"
+    ],
+    "price": 296.42,
+    "stock": 321,
+    "sales_rank": 2963
+  },
+  {
+    "id": "P00004",
+    "name": "Silent Mechanical Compact Foldable",
+    "category": "Electronics/Audio/Headphones",
+    "tags": [
+      "bluetooth",
+      "foldable",
+      "usb",
+      "adapter"
+    ],
+    "price": 455.69,
+    "stock": 427,
+    "sales_rank": 2989
+  },
+  {
+    "id": "P00005",
+    "name": "Cable Lamp",
+    "category": "Software/Productivity",
+    "tags": [
+      "monitor",
+      "mechanical",
+      "max"
+    ],
+    "price": 175.11,
+    "stock": 373,
+    "sales_rank": 2006
+  },
+  {
+    "id": "P00006",
+    "name": "Printer Adapter",
+    "category": "Electronics/Phones/Accessories",
+    "tags": [
+      "pro",
+      "foldable",
+      "chair",
+      "portable"
+    ],
+    "price": 821.87,
+    "stock": 412,
+    "sales_rank": 2585
+  },
+  {
+    "id": "P00814",
+    "name": "Wireless Keyboard Webcam",
+    "category": "Software/Productivity",
+    "tags": [
+      "digital",
+      "headset"
+    ],
+    "price": 535.9,
+    "stock": 71,
+    "sales_rank": 4728
+  },
+    {
+    "id": "P00814",
+    "name": "Wireless Keyboard Webcams",
+    "category": "Software/Productivity",
+    "tags": [
+      "digital",
+      "headset"
+    ],
+    "price": 535.9,
+    "stock": 71,
+    "sales_rank": 4728
+  },
+  {
+    "id": "P00814",
+    "name": "Wireless Keyboard Webcom",
+    "category": "Software/Productivity",
+    "tags": [
+      "digital",
+      "headset"
+    ],
+    "price": 535.9,
+    "stock": 71,
+    "sales_rank": 4728
+  }
+]
