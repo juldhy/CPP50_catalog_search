@@ -1,18 +1,18 @@
-import json
+from engine.index import search_index
 from engine.ranking import search
 
 
 class CategoryTree:
 
-    def __init__(self, json_file: str):
-        self.json_file = json_file
-        self.catalog = self._build_catalog()
+    """
+    A self-contained class that builds a category tree with the imported catalog of products.
+    It then gives access to a search_by_category method, which processes the category argument of the user's query
+    to filter potential results before using the general search method for ranking said results.
+    """
+
+    def __init__(self):
+        self.catalog = search_index.catalog
         self.tree = self._build_category_tree()
-
-
-    def _build_catalog(self) -> list[dict]:
-        with open(self.json_file, "r", encoding="utf-8") as f:
-            return json.load(f)
 
 
     def _build_category_tree(self) -> dict:
