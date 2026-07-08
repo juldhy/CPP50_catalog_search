@@ -3,7 +3,6 @@ from engine.ranking import search
 
 
 class CategoryTree:
-
     """
     A self-contained class that builds a category tree with the imported catalog of products.
     It then gives access to a search_by_category method, which processes the category argument of the user's query
@@ -18,7 +17,7 @@ class CategoryTree:
         # Creates and returns a series of nested dictionaries representing a tree with all the categories.
         category_tree = {}
         index_categories = {}
-        for entry in self.catalog:
+        for entry in self.catalog.values():
             category_str = entry.get("category", "")
             # Skip processing if the WHOLE path already exists, or is empty somehow.
             if category_str in index_categories or not category_str:
@@ -44,8 +43,9 @@ class CategoryTree:
                 current_level = current_level[step]
         return category_tree
 
-
-    def search_in_category(self, query: str, category: str, top_k: int = 10) -> list[dict]:
+    def search_in_category(
+        self, query: str, category: str, top_k: int = 10
+    ) -> list[dict]:
         """
         Runs a search by category if the user entered any in the search query's adequate argument.
 
@@ -84,14 +84,18 @@ class CategoryTree:
             if entry not in current_level:
                 error_in_path = True
                 if full_valid_path == "":
-                    print(f"The first category you entered ({entry}) doesn't exist. "
-                          f"Displaying {limited_results_after_error} items based only on {query}.")
+                    print(
+                        f"The first category you entered ({entry}) doesn't exist. "
+                        f"Displaying {limited_results_after_error} items based only on {query}."
+                    )
                 else:
                     limited_results_after_error = min(limited_results_after_error, 5)
-                    print(f"The {entry} subcategory doesn't exist. "
-                          f"Displaying {limited_results_after_error} items in the {full_valid_path} category.")
+                    print(
+                        f"The {entry} subcategory doesn't exist. "
+                        f"Displaying {limited_results_after_error} items in the {full_valid_path} category."
+                    )
                 break
-            is_last = (i == len(category))
+            is_last = i == len(category)
             current_search_level[entry] = None if is_last else {}
             current_level = current_level[entry]
             current_search_level = current_search_level[entry]
@@ -103,9 +107,11 @@ class CategoryTree:
         else:
             # Run the search based on the final, deepest level reached in the category tree.
             valid_results = []
-            for item in self.catalog:
+            for item in self.catalog.values():
                 if full_valid_path in item.get("category"):
                     valid_results.append(item["id"])
-            return search(query,
-                        top_k if not error_in_path else limited_results_after_error,
-                        lambda product_id: product_id in valid_results)
+            return search(
+                query,
+                top_k if not error_in_path else limited_results_after_error,
+                lambda product_id: product_id in valid_results,
+            )
