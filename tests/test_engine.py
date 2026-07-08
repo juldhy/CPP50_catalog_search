@@ -97,7 +97,7 @@ class TestIndex(unittest.TestCase):
 
 class TestCategories(unittest.TestCase):
     def setUp(self):
-        self.category_tree = CategoryTree("catalog.json")
+        self.category_tree = CategoryTree()
         self.longMessage = True
 
     def tearDown(self):
