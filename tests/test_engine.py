@@ -2,6 +2,7 @@ import math
 import unittest
 from unittest.mock import MagicMock, patch
 
+from engine.categories import CategoryTree
 from engine.tokenize import tokenize
 from engine.index import search_index, SearchIndex
 from engine.ranking import search, compute_score
@@ -96,13 +97,54 @@ class TestIndex(unittest.TestCase):
 
 class TestCategories(unittest.TestCase):
     def setUp(self):
-        pass
+        self.category_tree = CategoryTree("catalog.json")
+        self.longMessage = True
 
     def tearDown(self):
         pass
 
+    def check_results(self, single_query_token:str, category:str):
+        results = self.category_tree.search_in_category(single_query_token, category)
+        self.assertNotEqual([], results)
+        for product in results:
+            self.assertTrue(product["category"].lower().startswith(category.lower()), msg=f"product category {product["category"].lower()} doesn't match {category.lower()}")
+            self.assertTrue(single_query_token.lower() in map(str.lower, product['tags']) or single_query_token.lower() in product['name'].lower())
+        return results
+
+
     def test_categories(self):
-        pass
+        # empty query, empty category
+        self.assertEqual([], self.category_tree.search_in_category("",""))
+
+        # empty query, non-empty top category
+        self.assertEqual([], self.category_tree.search_in_category("","Software"))
+
+        # empty query, non-empty non-top category
+        self.assertEqual([], self.category_tree.search_in_category("","Software/Security"))
+
+        # non-empty query, non-empty top category, non-empty intersection
+        self.check_results("keyboard", "Software")
+
+        # non-empty query, non-empty leaf category, non-empty intersection
+        self.check_results("keyboard", "Software/Security")
+
+        # non-empty query, non-empty non-top leaf category, non-empty intersection
+        self.check_results("Hub", "Electronics/Audio/Headphones")
+
+        # non-empty query, non-empty non-top non-leaf category, no intersection
+        self.check_results("Hub", "Electronics/Audio")
+
+        # non-empty query, 1 keyword match, non-empty leaf category, non-empty intersection
+        self.assertEqual([], self.category_tree.search_in_category("blabla","Electronics/Audio"))
+        res_2 = self.check_results("Hub", "Electronics/Audio")
+        self.assertEqual(res_2, self.category_tree.search_in_category("blabla hub", "Electronics/Audio"))
+
+        # non-empty query, 2 keyword matches, non-empty leaf category, non-empty intersection
+        res_1 = map(lambda x: x['id'], self.check_results("laser", "Electronics/Audio"))
+        res_2 = map(lambda x: x['id'], self.check_results("Hub", "Electronics/Audio"))
+        #self.assertEqual(
+        #    set(res_1) | set(res_2),
+        #    set(map(lambda x: x['id'], self.category_tree.search_in_category("laser hub", "Electronics/Audio"))))
 
 
 class TestSuggest(unittest.TestCase):
