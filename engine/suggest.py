@@ -1,5 +1,3 @@
-from itertools import starmap
-
 from engine.index import search_index
 
 
