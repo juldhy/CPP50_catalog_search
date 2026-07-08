@@ -31,7 +31,7 @@ def main():
     # Get results based on category or not
     search_results: list = []
     if parser.category:
-        c = CategoryTree("./catalog.json")
+        c = CategoryTree()
         search_results = c.search_in_category(
             parser.search, parser.category, top_k=parser.top
         )
