@@ -1,5 +1,5 @@
 import json
-from engine.ranking import compute_score
+from engine.ranking import search
 
 
 class CategoryTree:
@@ -43,41 +43,67 @@ class CategoryTree:
                 current_level = current_level[step]
         return category_tree
 
-    def search_in_category(self, query: str, category: str, top_k: int = 10) -> list:
+
+    def search_in_category(self, query: str, category: str, top_k: int = 10) -> list[dict]:
+        """
+        Runs a search by category if the user entered any in the search query's adequate argument.
+
+        This method receives the full query, after the words have been processed. If there is a category
+        argument in the search, then this method receives it, processes the category into a valid format
+        while checking its existence in the catalog. If matches are found, they are then ranked by pertinence
+        according to the same formula as for regular searches before being returned as a list.
+
+        Args:
+            self.tree : the tree-shaped representation of the category paths present in the catalog.
+            self.catalog : the catalog as a whole.
+            query (str): The search terms for the category argument entered by the user.
+            category (str): The category argument entered by the user.
+            top_k (int, optional): Maximum number of results to return.
+                Defaults to 10.
+
+        Returns:
+            list[str]: A list of product names matching the searched categories.
+
+        Edge cases:
+            - if the first category researched doesn't exist, the method stops building the path and informs the user.
+            The results are limited to a maximum of 3 so that the whole catalog doesn't get printed.
+            - if the path-building breaks at any point, the user is informed of the point of failure, and results are
+            returned based on the full valid path built thus far. Those results are also limited to 3.
+        """
         category = list(word.capitalize() for word in category.split("/"))
         current_level = self.tree
         search_request = {}
         current_search_level = search_request
         full_valid_path = ""
+        error_in_path = False
+        limited_results_after_error = min(top_k, 3)
 
         # Find the deepest correct category match based on category input.
         for i, entry in enumerate(category, start=1):
             if entry not in current_level:
-                print(f"Your search yielded no results in the {entry} category.")
+                error_in_path = True
+                if full_valid_path == "":
+                    print(f"The {entry} category doesn't exist. "
+                          f"Displaying {limited_results_after_error} items based only on {query}.")
+                else:
+                    print(f"The {entry} subcategory doesn't exist. Displaying items in the {full_valid_path} category.")
                 break
-            else:
-                is_last = i == len(category)
-                current_search_level[entry] = None if is_last else {}
+            is_last = (i == len(category))
+            current_search_level[entry] = None if is_last else {}
             current_level = current_level[entry]
             current_search_level = current_search_level[entry]
             full_valid_path = f"{full_valid_path}/{entry}" if full_valid_path else entry
 
-        # Run the search based on the final, deepest level reached in the category tree.
-        valid_results = []
-        for item in self.catalog:
-            if full_valid_path in item.get("category"):
-                valid_results.append(item)
-
-        # Weigh valid products based on the scoring algorithm.
-        weighted_results = []
-        for item in valid_results:
-            score = compute_score(item, set(query))
-            weighted_results.append((score, item))
-
-        # Sort by relevance and limit the amount of results displayed.
-        weighted_results.sort(reverse=True, key=lambda x: x[1]["name"])
-        final_results = []
-        for i in range(min(len(weighted_results), top_k)):
-            final_results.append(weighted_results[i][1])
-
+        # Safeguarding against no valid path potentially returning the whole catalog.
+        if error_in_path and full_valid_path == "":
+            final_results = search(query, limited_results_after_error)
+        else:
+            # Run the search based on the final, deepest level reached in the category tree.
+            valid_results = []
+            for item in self.catalog:
+                if full_valid_path in item.get("category"):
+                    valid_results.append(item["id"])
+            final_results = search(query,
+                                   top_k if not error_in_path else limited_results_after_error,
+                                   lambda product_id: product_id in valid_results)
         return final_results
