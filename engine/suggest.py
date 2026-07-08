@@ -1,3 +1,5 @@
+from itertools import starmap
+
 from engine.index import search_index
 
 
@@ -31,7 +33,7 @@ def suggest(query: str, max_suggestions: int = 3, lexicon: list[str] = search_in
             possible_matches.append((distance, word))
     possible_matches.sort()
     # Added Alain's suggestion to build the final list in a single line with list comprehension
-    return [match for match in possible_matches[0:min(len(possible_matches), max_suggestions)]]
+    return [match[1] for match in possible_matches[0:min(len(possible_matches), max_suggestions)]]
 
 
 def check_edit_distance(long_word: str, short_word : str) -> int:
