@@ -24,7 +24,7 @@ def compute_score(product, query_tokens : set[str]) -> float:
             + (1 / math.log2(product['sales_rank'] + 2)) * 0.3
 
 
-def search(query: str, top_k: int = 10, filter_fn = None) -> list[str]:
+def search(query: str, top_k: int = 10, filter_fn = None) -> list[dict]:
     """
     This function
     - tokenises the query the same way as the index
