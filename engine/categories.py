@@ -9,11 +9,9 @@ class CategoryTree:
         self.catalog = self._build_catalog()
         self.tree = self._build_category_tree()
 
-
     def _build_catalog(self) -> list:
         with open(self.json_file, "r", encoding="utf-8") as f:
             return json.load(f)
-
 
     def _build_category_tree(self) -> dict:
         # Creates and returns a series of nested dictionaries representing a tree with all the categories.
@@ -29,7 +27,9 @@ class CategoryTree:
             accumulated_path = ""
             for i, step in enumerate(path, start=1):
                 # Proper formatting to avoid putting a / on the final category of a branch.
-                accumulated_path = f"{accumulated_path}/{step}" if accumulated_path else step
+                accumulated_path = (
+                    f"{accumulated_path}/{step}" if accumulated_path else step
+                )
                 # Skip ahead if this part of the path already exists.
                 if accumulated_path in index_categories:
                     current_level = index_categories[accumulated_path]
@@ -37,7 +37,7 @@ class CategoryTree:
                 # Creation of the new entry happens here: None if we're at the end of a branch,
                 # empty dict otherwise because we know it will be filled on the next step anyway.
                 if step not in current_level:
-                    is_last = (i == len(path))
+                    is_last = i == len(path)
                     current_level[step] = None if is_last else {}
                 index_categories[accumulated_path] = current_level[step]
                 current_level = current_level[step]

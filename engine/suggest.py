@@ -34,7 +34,8 @@ def suggest(query: str, max_suggestions: int = 3, lexicon: list[str] = search_in
     return [match for match in possible_matches[0:min(len(possible_matches), max_suggestions)]]
 
 
-def check_edit_distance(long_word: str, short_word : str) -> int:
+
+def check_edit_distance(long_word: str, short_word: str) -> int:
     if len(short_word) > len(long_word):
         short_word, long_word = long_word, short_word
     # Creating the 2D-list, and filling the starting "cells"
@@ -51,5 +52,7 @@ def check_edit_distance(long_word: str, short_word : str) -> int:
             if short_word[i] == long_word[j]:
                 matrix[i+1][j+1] = min(matrix[i][j], matrix[i][j+1], matrix[i+1][j])
             else:
-                matrix[i+1][j+1] = min(matrix[i][j], matrix[i][j+1], matrix[i+1][j]) + 1
+                matrix[i + 1][j + 1] = (
+                    min(matrix[i][j], matrix[i][j + 1], matrix[i + 1][j]) + 1
+                )
     return matrix[-1][-1]
