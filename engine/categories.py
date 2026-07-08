@@ -10,7 +10,7 @@ class CategoryTree:
         self.tree = self._build_category_tree()
 
 
-    def _build_catalog(self) -> list:
+    def _build_catalog(self) -> list[dict]:
         with open(self.json_file, "r", encoding="utf-8") as f:
             return json.load(f)
 
@@ -58,17 +58,16 @@ class CategoryTree:
             self.catalog : the catalog as a whole.
             query (str): The search terms for the category argument entered by the user.
             category (str): The category argument entered by the user.
-            top_k (int, optional): Maximum number of results to return.
-                Defaults to 10.
+            top_k (int, optional): Maximum number of results to return. Defaults to 10.
 
         Returns:
-            list[str]: A list of product names matching the searched categories.
+            list[str]: A list of products (as catalog entries) matching the searched category and terms.
 
         Edge cases:
             - if the first category researched doesn't exist, the method stops building the path and informs the user.
             The results are limited to a maximum of 3 so that the whole catalog doesn't get printed.
             - if the path-building breaks at any point, the user is informed of the point of failure, and results are
-            returned based on the full valid path built thus far. Those results are also limited to 3.
+            returned based on the full valid path built thus far. Those results are limited to 5.
         """
         category = list(word.capitalize() for word in category.split("/"))
         current_level = self.tree
@@ -80,13 +79,16 @@ class CategoryTree:
 
         # Find the deepest correct category match based on category input.
         for i, entry in enumerate(category, start=1):
+            # Treat mistakes first, based on whether the category argument is fully or partially wrong.
             if entry not in current_level:
                 error_in_path = True
                 if full_valid_path == "":
-                    print(f"The {entry} category doesn't exist. "
+                    print(f"The first category you entered ({entry}) doesn't exist. "
                           f"Displaying {limited_results_after_error} items based only on {query}.")
                 else:
-                    print(f"The {entry} subcategory doesn't exist. Displaying items in the {full_valid_path} category.")
+                    limited_results_after_error = min(limited_results_after_error, 5)
+                    print(f"The {entry} subcategory doesn't exist. "
+                          f"Displaying {limited_results_after_error} items in the {full_valid_path} category.")
                 break
             is_last = (i == len(category))
             current_search_level[entry] = None if is_last else {}
@@ -96,14 +98,13 @@ class CategoryTree:
 
         # Safeguarding against no valid path potentially returning the whole catalog.
         if error_in_path and full_valid_path == "":
-            final_results = search(query, limited_results_after_error)
+            return search(query, limited_results_after_error)
         else:
             # Run the search based on the final, deepest level reached in the category tree.
             valid_results = []
             for item in self.catalog:
                 if full_valid_path in item.get("category"):
                     valid_results.append(item["id"])
-            final_results = search(query,
-                                   top_k if not error_in_path else limited_results_after_error,
-                                   lambda product_id: product_id in valid_results)
-        return final_results
+            return search(query,
+                        top_k if not error_in_path else limited_results_after_error,
+                        lambda product_id: product_id in valid_results)
